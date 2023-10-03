@@ -1,0 +1,14 @@
+{% extends 'room_layout.html' %}
+
+{% block content %}
+<div>
+    <h1>{{room}}</h1>
+    <p>SCHEDULE:</p>
+    <ul>
+        {% for slot in schedule %}
+        <li>{{slot}}</li>
+        {% endfor %}
+
+
+</div>
+{% endblock %}
