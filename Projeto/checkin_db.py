@@ -56,12 +56,8 @@ def new_checkin(place_id, user_id, timeofcheckin, timeofcheckout):
     session.commit()
 
 
-def checkout(place_id, user_id, timeofcheckout):
-    book = (
-        session.query(Book)
-        .filter_by(place_id=place_id, user_id=user_id, timeofcheckout=None)
-        .first()
-    )
+def checkout(user_id, timeofcheckout):
+    book = session.query(Book).filter_by(user_id=user_id, timeofcheckout=None).first()
     if book is None:
         return "No checkin found"
     else:
