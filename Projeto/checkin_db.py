@@ -10,7 +10,7 @@ from os import path
 
 
 #SLQ access layer initialization
-DATABASE_FILE = "database.sqlite"
+DATABASE_FILE = "checkin.sqlite"
 db_exists = False
 if path.exists(DATABASE_FILE):
     db_exists = True
