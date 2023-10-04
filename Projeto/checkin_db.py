@@ -22,6 +22,7 @@ Base = declarative_base()
 
 #Declaration of data
 class Book(Base):
+    __tablename__ = 'book'
     id = Column(Integer, primary_key=True)
     place_id = Column(String, nullable=False)
     user_id = Column(String, nullable=False)

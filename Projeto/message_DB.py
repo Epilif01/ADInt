@@ -22,7 +22,30 @@ Base = declarative_base()
 
 #Declaration of data
 class Message(Base):
+    __tablename__ = 'message'
     id = Column(Integer, primary_key=True)
     sender = Column(String, nullable=False)
     message = Column(String, nullable=False)
     destination = Column(String, nullable=False)
+
+    def __repr__(self):
+        return "<Message(sender='%s', message='%s', destination='%s')>" % (
+                                self.sender, self.message, self.destination)
+
+Base.metadata.create_all(engine) #Create tables for the data models
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+def new_message(sender, message, destination):
+    message = Message(sender=sender, message=message, destination=destination)
+    session.add(message)
+    session.commit()
+
+def messages_sent(sender):
+    messages = session.query(Message).filter_by(sender=sender).all()
+    return messages
+
+def messages_received(destination):
+    messages = session.query(Message).filter_by(destination=destination).all()
+    return messages
