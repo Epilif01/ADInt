@@ -1,0 +1,15 @@
+{% extends 'messages_layout.html' %}
+
+{% block content %}
+   <div>
+   <form action = "/sendMessage" method="post">
+    <p>From:</p>
+    <textarea id="user_id" name="user_id" rows="1" cols="12"></textarea>
+    <p>To:</p>
+    <textarea id="destination" name="destination" rows="1" cols="12"></textarea>
+    <p>Message:</p>
+    <textarea id="review" name="review" rows="12" cols="35"></textarea>
+   <input type="submit">
+</form>
+    </div>
+    {% endblock %}

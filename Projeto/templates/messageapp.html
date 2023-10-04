@@ -1,0 +1,13 @@
+{% extends 'messages_layout.html' %}
+
+{% block content %}
+    <div>
+        <h1>Welcome to Message App</h1>
+        <p>What would you like to do:</p>
+        <ul>
+                <li><a href="/sendMessage">Send a message</a></li>
+                <li><a href="/messagesSent">View Messages Sent</a></li>
+                <li><a href="/messagesReceived">View Messages Received</a></li>
+        </ul>
+    </div>
+{% endblock %}

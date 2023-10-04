@@ -11,7 +11,7 @@ app = Flask(__name__)
 def index():
     return render_template("check_in_app.html")
 
-@app.route("/send_message", methods=['GET', 'POST'])
+@app.route("/sendMessage", methods=['GET', 'POST'])
 def send_message():
     if request.method == 'GET':
         return render_template("send_message.html")
@@ -23,7 +23,7 @@ def send_message():
         db.new_message(user_id, message, destination)
         return redirect("/")
     
-@app.route("/messages_sent", methods=['GET', 'POST'])
+@app.route("/messagesSent", methods=['GET', 'POST'])
 def messages_sent():
     if request.method == 'GET':
         return render_template("messages_sent.html")
@@ -34,7 +34,7 @@ def messages_sent():
         print(messages)
         return redirect("/")
     
-@app.route("/messages_received", methods=['GET', 'POST'])
+@app.route("/messagesReceived", methods=['GET', 'POST'])
 def messages_received():
     if request.method == 'GET':
         return render_template("messages_received.html")
