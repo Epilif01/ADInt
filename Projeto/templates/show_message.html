@@ -1,0 +1,13 @@
+{% extends 'messages_layout.html' %}
+
+{% block content %}
+    <div>
+        <p>Messages:</p>
+        <ul>
+            {% for item in messages %}
+                <li>{{item}}</li>
+            {% endfor %}
+        </ul>
+
+    </div>
+{% endblock %}

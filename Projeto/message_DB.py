@@ -43,9 +43,9 @@ def new_message(sender, message, destination):
     session.commit()
 
 def messages_sent(sender):
-    messages = session.query(Message).filter_by(sender=sender).all()
+    messages = session.query(Message).filter_by(sender=sender)
     return messages
 
 def messages_received(destination):
-    messages = session.query(Message).filter_by(destination=destination).all()
+    messages = session.query(Message).filter_by(destination=destination)
     return messages

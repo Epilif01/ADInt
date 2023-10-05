@@ -1,0 +1,11 @@
+{% extends 'messages_layout.html' %}
+
+{% block content %}
+   <div>
+   <form action = "/messagesReceived" method="post">
+    <p>User:</p>
+    <textarea id="user_id" name="user_id" rows="1" cols="12"></textarea>
+    <input type="submit">
+</form>
+    </div>
+    {% endblock %}

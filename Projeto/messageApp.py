@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("check_in_app.html")
+    return render_template("messageapp.html")
 
 @app.route("/sendMessage", methods=['GET', 'POST'])
 def send_message():
@@ -30,9 +30,11 @@ def messages_sent():
     else:
         print(request.form)
         user_id = request.form['user_id']
-        messages = db.messages_sent(user_id)
+        messages = []
+        for row in db.messages_sent(user_id):
+            messages.append(row.message)
         print(messages)
-        return redirect("/")
+        return render_template("show_message.html", messages=messages)
     
 @app.route("/messagesReceived", methods=['GET', 'POST'])
 def messages_received():
@@ -41,6 +43,11 @@ def messages_received():
     else:
         print(request.form)
         user_id = request.form['user_id']
-        messages = db.messages_received(user_id)
+        messages = []
+        for row in db.messages_received(user_id):
+            messages.append(row.message)
         print(messages)
-        return redirect("/")
+        return render_template("show_message.html", messages=messages)
+    
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=8005, debug=True)
