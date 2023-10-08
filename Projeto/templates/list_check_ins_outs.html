@@ -1,0 +1,22 @@
+{% extends 'check_in_app.html' %}
+
+{% block content %}
+<div>
+    <h1>{{user_id}}</h1>
+    {% if checkinsouts %}
+    {% for checkinout in checkinsouts %}
+    <ul>
+        <li>{{checkinout["place_id"]}}</li>
+        <ul>
+            <li>Check-in at {{checkinout["timeofcheckin"]}}</li>
+            {% if checkinout["timeofcheckout"] %}
+            <li>Check-out at {{checkinout["timeofcheckout"]}}</li>
+            {% endif %}
+        </ul>
+    </ul>
+    {% endfor %}
+    {% endif %}
+
+
+</div>
+{% endblock %}
