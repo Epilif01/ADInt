@@ -72,3 +72,11 @@ def getCheckin(user_id):
         return None
     else:
         return book.place_id
+
+
+def getCheckinsouts(user_id):
+    book = session.query(Book).filter_by(user_id=user_id).all()
+    if book is None:
+        return None
+    else:
+        return book

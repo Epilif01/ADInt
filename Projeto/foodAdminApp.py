@@ -5,16 +5,19 @@ proxy = client.ServerProxy("http://localhost:8001/api")
 print("Welcome to the Food Admin App")
 print("Please authenticate yourself")
 username = input("Username: ")
-print("Welcome %s" % username)
+
+
+print("\n\nWelcome %s!" % username)
 
 while True:
-    print("Please select an option:")
+    print("\nPlease select an option:")
     print("1. Create restaurant")
     print("2. My Restaurants")
     print("3. Update menu")
     print("4. Show reviews")
     print("5. Exit")
     option = input("Option: ")
+    print("\n")
     try:
         if option == "1":
             name = input("Restaurant name: ")
@@ -34,9 +37,11 @@ while True:
                 continue
             menu = []
             while True:
-                item = input("Item (or empty to finish): ")
-                if item == "":
+                item = input("Item (or type 'close' to finish): ")
+                if item == "close":
                     break
+                elif item == "":
+                    continue
                 menu.append(item)
             proxy.updateMenu(name, menu)
         elif option == "4":

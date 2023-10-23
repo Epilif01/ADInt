@@ -62,5 +62,23 @@ def check_in_failed(place_id):
     return render_template("check_in_failed.html", place_id=place_id)
 
 
+@app.route("/get_check_ins_outs", methods=["GET", "POST"])
+def get_check_ins_outs():
+    if request.method == "GET":
+        return render_template("get_check_ins_outs.html")
+    else:
+        print(request.form)
+        user_id = request.form["user_id"]
+        return redirect("/list_check_ins_outs/" + user_id)
+
+
+@app.route("/list_check_ins_outs/<path:user_id>")
+def list_check_ins_outs(user_id):
+    checkinsouts = db.getCheckinsouts(user_id)
+    return render_template(
+        "list_check_ins_outs.html", user_id=user_id, checkinsouts=checkinsouts
+    )
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8003, debug=True)
