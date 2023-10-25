@@ -33,8 +33,9 @@
         {% endwith %}
         {% if current_user.is_authenticated %}
         <h2>Hi, {{ current_user.username }}!</h2>
-        <p>
+        <div class="buttonContainer" display="flex">
             <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
+            <a class="btn btn-primary" id="messages">Messages</a>
         </p>
         {% else %}
         <p>
@@ -43,7 +44,7 @@
         {% endif %}
 
         <h2> QR Code reader</h2>
-        <a class="btn btn-primary" id="QRCodeBTN">Read QRCode</a>
+        <button class="btn btn-primary" id="QRCodeBTN">Read QRCode</button>
         <div class="qrcodereader" style="width: 500px; display:none;" id="reader"></div>
 
 
