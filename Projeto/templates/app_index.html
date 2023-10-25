@@ -32,25 +32,41 @@
         {% endif %}
         {% endwith %}
         {% if current_user.is_authenticated %}
-        <h2>Hi, {{ current_user.username }}!</h2>
-        <div class="buttonContainer" display="flex">
-            <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
-            <a class="btn btn-primary" id="messages">Messages</a>
-        </p>
+          <h2>Hi, {{ current_user.username }}!</h2>
+          <div class="buttonContainer" display="flex">
+              <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
+              <button class="btn btn-primary" id="screenToggle">Messages</button>
+              <button class="btn btn-primary" id="screenToggle1" style="display:none;">Main</button>
+          </div>
         {% else %}
         <p>
             <a class="btn btn-primary" href="{{ url_for('oauth2_authorize', provider='fenix') }}">Login with FENIX</a>
         </p>
         {% endif %}
 
-        <h2> QR Code reader</h2>
-        <button class="btn btn-primary" id="QRCodeBTN">Read QRCode</button>
-        <div class="qrcodereader" style="width: 500px; display:none;" id="reader"></div>
+        <div id="screenToggle2">
+          <h2> QR Code reader</h2>
+          <button class="btn btn-primary" id="QRCodeBTN">Read QRCode</button>
+          <div class="qrcodereader" style="width: 500px; display:none;" id="reader"></div>
 
 
-        <div class="info" style="display:none;" id="info">
-            <h2>INFO</h2>
-            <a class="btn btn-primary" id="info">Info</a>
+          <div class="info" style="display:none;" id="info">
+              <h2>INFO</h2>
+              <a class="btn btn-primary" id="info">Info</a>
+          </div>
+        </div>
+        
+        <div class="messagesMenu" id="screenToggle3" style="display:none;">
+          <h2>Room: {{Room}}</h2>
+          <h2>Users:</h2>
+          <div class="ui form">
+            <div class="field">
+              <textarea rows="2" placeholder="Type your message..."></textarea>
+            </div>
+            <button class="ui primary button" type="submit">Send</button>
+          </div>
+          <h2>Messages:</h2>
+          
         </div>
     </div>
 
@@ -89,7 +105,18 @@
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
         html5QrcodeScanner.render(onScanSuccess);
 
-
+          $("#screenToggle").click(function () {
+            $("#screenToggle").toggle();
+            $("#screenToggle1").toggle();
+            $("#screenToggle2").toggle();
+            $("#screenToggle3").toggle();
+          });
+          $("#screenToggle1").click(function () {
+            $("#screenToggle").toggle();
+            $("#screenToggle1").toggle();
+            $("#screenToggle2").toggle();
+            $("#screenToggle3").toggle();
+          });
     </script>
 </body>
 
