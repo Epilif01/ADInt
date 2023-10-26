@@ -21,8 +21,9 @@ while True:
     try:
         if option == "1":
             name = input("Restaurant name: ")
+            room_id = input("room_id")
 
-            restaurantExists = proxy.validateRestaurant(name, username)
+            restaurantExists = proxy.validateRestaurant(name, room_id)
             if restaurantExists == True:
                 print("That restaurant already exists")
                 continue

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
 from flask_xmlrpcre.xmlrpcre import *
 import os
+import requests
 import foodS_DB as db
 import json
 import datetime
@@ -12,9 +13,19 @@ handler = XMLRPCHandler('api')
 handler.connect(app, '/api')
 
 @handler.register
-def createRestaurant(name, owner):
+def createRestaurant(name, room_id):
     if db.findRestaurant(name) == None:
-        db.createRestaurant(name, owner)
+        db.createRestaurant(name, room_id)
+        url = "http://localhost:8000/api"
+        data = {
+            "link": "%s" % room_id
+        }   
+        headers = {
+        "Content-Type": "application/json"
+        }
+        response = requests.post(url, json=data, headers=headers)
+        print(response.status_code)
+        print(response.json())
 
 @handler.register
 def validateRestaurant(name, owner):

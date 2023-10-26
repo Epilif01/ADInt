@@ -23,11 +23,12 @@ Base = declarative_base()
 class Restaurant(Base):
     __tablename__ = 'restaurant'
     id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, nullable=False, unique=True)
     name = Column(String, nullable=False)
-    owner = Column(String, nullable=False)
+    #owner = Column(String, nullable=False)
         
     def __repr__(self):
-        return "<Restaurant(name='%s', owner='%s')>" % (self.name, self.owner)
+        return "<Restaurant(name='%s', owner='%s')>" % (self.name, self.room_id)
     
 class Menu(Base):
     __tablename__ = 'menu'
@@ -59,8 +60,8 @@ Base.metadata.create_all(engine) #Create tables for the data models
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def createRestaurant(name, owner):
-    restaurant = Restaurant(name=name, owner=owner)
+def createRestaurant(name, room_id):
+    restaurant = Restaurant(name=name, room_id=room_id)
     session.add(restaurant)
     session.commit()
 
