@@ -14,7 +14,7 @@ handler.connect(app, '/api')
 
 @handler.register
 def createRestaurant(name, room_id):
-    if db.findRestaurant(name) == None:
+    if db.findRestaurant(room_id) == None:
         db.createRestaurant(name, room_id)
         url = "http://localhost:8000/api"
         data = {
@@ -26,19 +26,20 @@ def createRestaurant(name, room_id):
         response = requests.post(url, json=data, headers=headers)
         print(response.status_code)
         print(response.json())
+        new_url = "http://localhost:8000/files/%s" % response.json()['filename']
+        return new_url
 
 @handler.register
-def validateRestaurant(name, owner):
-    if db.findRestaurant(name) == None:
+def validateRestaurant(room_id):
+    if db.findRestaurant(room_id) == None:
         return False
     else:
         return True
     
 @handler.register
-def myRestaurants(owner):
-    print("Entrei aqui")
+def myRestaurants():
     restaurants = []
-    for row in db.myRestaurants(owner):
+    for row in db.myRestaurants():
         print (row.name)
         restaurants.append(row.name)
     print ("My restaurants:")
@@ -46,16 +47,16 @@ def myRestaurants(owner):
     return restaurants
 
 @handler.register
-def updateMenu(name, menu):
-    restaurant = db.findRestaurant(name)
+def updateMenu(room_id, menu):
+    restaurant = db.findRestaurant(room_id)
     if restaurant != None:
         db.deleteMenu(restaurant.id)
     for item in menu:
         db.createMenu(item, restaurant.id)
 
 @handler.register
-def showReviews(name):
-    restaurant = db.findRestaurant(name)
+def showReviews(room_id):
+    restaurant = db.findRestaurant(room_id)
     if restaurant == None:
         return
     reviews = []

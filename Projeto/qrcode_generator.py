@@ -43,11 +43,16 @@ def index():
         qrcode_text = request.form['qrcodetext']
         filename = create_qrcode(qrcode_text)
         return send_from_directory(directory=FILE_DIR, path=filename)
+    
+@app.route('/files/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(directory=FILE_DIR, path=filename)
 
 @app.route('/api', methods=['POST'])
 def post_resource():
     data = request.get_json()
-    return jsonify({"message":"Resource created successfully"})
+    filename = create_qrcode(data['link'])
+    return jsonify({"filename":"%s" % filename})
 
 
 if __name__ == "__main__":

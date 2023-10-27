@@ -28,7 +28,7 @@ class Restaurant(Base):
     #owner = Column(String, nullable=False)
         
     def __repr__(self):
-        return "<Restaurant(name='%s', owner='%s')>" % (self.name, self.room_id)
+        return "<Restaurant(name='%s', room_id='%s')>" % (self.name, self.room_id)
     
 class Menu(Base):
     __tablename__ = 'menu'
@@ -65,11 +65,11 @@ def createRestaurant(name, room_id):
     session.add(restaurant)
     session.commit()
 
-def findRestaurant(name):
-    return session.query(Restaurant).filter_by(name=name).first()
+def findRestaurant(room_id):
+    return session.query(Restaurant).filter_by(room_id=room_id).first()
 
-def myRestaurants(owner):
-    return session.query(Restaurant).filter_by(owner=owner)
+def myRestaurants():
+    return session.query(Restaurant).all()
 
 def createMenu(item, restaurant_id):
     menu = Menu(item=item, restaurant_id=restaurant_id)

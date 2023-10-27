@@ -3,11 +3,11 @@ from xmlrpc import client
 proxy = client.ServerProxy("http://localhost:8001/api")
 
 print("Welcome to the Food Admin App")
-print("Please authenticate yourself")
-username = input("Username: ")
+""" print("Please authenticate yourself")
+username = input("Username: ") """
 
 
-print("\n\nWelcome %s!" % username)
+#print("\n\nWelcome %s!" % username)
 
 while True:
     print("\nPlease select an option:")
@@ -21,20 +21,21 @@ while True:
     try:
         if option == "1":
             name = input("Restaurant name: ")
-            room_id = input("room_id")
+            room_id = input("room_id: ")
 
-            restaurantExists = proxy.validateRestaurant(name, room_id)
+            restaurantExists = proxy.validateRestaurant(room_id)
             if restaurantExists == True:
                 print("That restaurant already exists")
                 continue
-            proxy.createRestaurant(name, username)
+            qrcode = proxy.createRestaurant(name, room_id)
+            print("Get you QRCode at: %s in the next 2 minutes" % qrcode)
         elif option == "2":
-            print(proxy.myRestaurants(username))
+            print(proxy.myRestaurants())
         elif option == "3":
-            name = input("Restaurant name: ")
-            restaurantExists = proxy.validateRestaurant(name, username)
+            room_id = input("Restaurant room_id: ")
+            restaurantExists = proxy.validateRestaurant(room_id)
             if restaurantExists == False:
-                print("You do not own a restaurant with that name")
+                print("There is not a restaurant with that room_id")
                 continue
             menu = []
             while True:
@@ -44,14 +45,14 @@ while True:
                 elif item == "":
                     continue
                 menu.append(item)
-            proxy.updateMenu(name, menu)
+            proxy.updateMenu(room_id, menu)
         elif option == "4":
             name = input("Restaurant name: ")
-            restaurantExists = proxy.validateRestaurant(name, username)
+            restaurantExists = proxy.validateRestaurant(room_id)
             if restaurantExists == False:
-                print("You do not own a restaurant with that name")
+                print("There is not a restaurant with that room_id")
                 continue
-            print(proxy.showReviews(name))
+            print(proxy.showReviews(room_id))
         elif option == "5":
             break
         else:
