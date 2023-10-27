@@ -50,9 +50,9 @@ def myRestaurants():
 def updateMenu(room_id, menu):
     restaurant = db.findRestaurant(room_id)
     if restaurant != None:
-        db.deleteMenu(restaurant.id)
+        db.deleteMenu(room_id)
     for item in menu:
-        db.createMenu(item, restaurant.id)
+        db.createMenu(item, room_id)
 
 @handler.register
 def showReviews(room_id):
@@ -60,7 +60,7 @@ def showReviews(room_id):
     if restaurant == None:
         return
     reviews = []
-    for row in db.showReviews(restaurant.id):
+    for row in db.showReviews(room_id):
         reviews.append(row.review)
     return reviews
 
