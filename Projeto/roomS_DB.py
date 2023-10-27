@@ -27,10 +27,10 @@ class Room(Base):
     __tablename__ = "room"
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    owner = Column(String, nullable=False)
+    room_id = Column(String, unique=True, nullable=False)
 
     def __repr__(self):
-        return f"<Room(name='{self.name}', owner='{self.owner}')>"
+        return f"<Room(name='{self.name}', room_id='{self.room_id}')>"
 
 
 class Schedule(Base):
@@ -39,7 +39,7 @@ class Schedule(Base):
     slot_start = Column(String, nullable=False)
     slot_end = Column(String, nullable=False)
     weekday = Column(String, nullable=False)
-    room_id = Column(Integer, ForeignKey("room.id"))
+    place_id = Column(Integer, ForeignKey("room.room_id"))
     room = relationship("Room", back_populates="schedule")
 
     def __repr__(self):
@@ -55,25 +55,29 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def createRoom(name, owner):
-    room = Room(name=name, owner=owner)
+def createRoom(name, room_id):
+    room = Room(name=name, room_id=room_id)
     session.add(room)
     session.commit()
 
 
-def findRoom(name):
-    return session.query(Room).filter_by(name=name).first()
+def findRoom(room_id):
+    return session.query(Room).filter_by(room_id=room_id).first()
 
 
-def myRooms(owner):
-    return session.query(Room).filter_by(owner=owner)
+def myRooms():
+    return session.query(Room).all()
 
 
-def createSchedule(weekday, slot_start, slot_end, room_id):
-    schedule = Schedule(
-        weekday=weekday, slot_start=slot_start, slot_end=slot_end, room_id=room_id
-    )
-    session.add(schedule)
+def createSchedule(room_id, data):
+    for event in data:
+        schedule = Schedule(
+            weekday=event["weekday"],
+            slot_start=event["slot_start"],
+            slot_end=event["slot_end"],
+            place_id=room_id,
+        )
+        session.add(schedule)
     session.commit()
 
 

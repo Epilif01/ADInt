@@ -10,19 +10,19 @@ handler.connect(app, "/api")
 
 
 @handler.register
-def createRoom(name, owner):
-    if db.findRoom(name) == None:
-        db.createRoom(name, owner)
+def createRoom(name, room_id):
+    if db.findRoom(room_id) == None:
+        db.createRoom(name, room_id)
 
 @handler.register
-def realRoom(room_id):
+def updateFromFenix(room_id):
     url = " https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/%s" % room_id 
     
     try:
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            return jsonify(data)
+            updateSchedule(room_id, data['events'])                  
         else:
             return jsonify({"error": "Failed to fetch data from the API"}), 500
 
@@ -31,17 +31,17 @@ def realRoom(room_id):
 
 
 @handler.register
-def validateRoom(name, owner):
-    if db.findRoom(name) == None:
+def validateRoom(room_id):
+    if db.findRoom(room_id) == None:
         return False
     else:
         return True
 
 
 @handler.register
-def myRooms(owner):
+def myRooms():
     rooms = []
-    for row in db.myRooms(owner):
+    for row in db.myRooms():
         print(row.name)
         rooms.append(row.name)
     print(rooms)
@@ -49,11 +49,11 @@ def myRooms(owner):
 
 
 @handler.register
-def updateSchedule(name, weekday, slot_start, slot_end):
-    room = db.findRoom(name)
-    if room != None:
-        db.deleteSchedule(room.id)
-    db.createSchedule(weekday, slot_start, slot_end, room.id)
+def updateSchedule(room_id, data):
+    room = db.findRoom(room_id)
+    #if room_id != None:
+    #   db.deleteSchedule(room.id)
+    db.createSchedule(room.id, data)
 
 
 @app.route("/")
@@ -61,22 +61,22 @@ def updateSchedule(name, weekday, slot_start, slot_end):
 def index():
     rooms = []
     for row in db.session.query(db.Room):
-        rooms.append(row.name)
+        rooms.append(row.name, row.room_id)
     return render_template("roomserviceapp.html", rooms=rooms)
 
 
-@app.route("/room/<name>")
-def room(name):
-    return render_template("room.html", room=name)
+@app.route("/room/<room_id>")
+def room(room_id):
+    return render_template("room.html", room_id=room_id)
 
 
-@app.route("/room/<name>/schedule")
-def schedule(name):
-    room = db.findRoom(name)
+@app.route("/room/<room_id>/schedule")
+def schedule(room_id):
+    room = db.findRoom(room_id)
     schedule = []
     for row in db.session.query(db.Schedule).filter_by(room_id=room.id):
         schedule.append((row.weekday, row.slot_start, row.slot_end))
-    return render_template("schedule.html", schedule=schedule, room=name)
+    return render_template("schedule.html", schedule=schedule, room_id=room_id)
 
 
 if __name__ == "__main__":

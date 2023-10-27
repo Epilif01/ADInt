@@ -12,7 +12,8 @@ while True:
     print("1. Create room")
     print("2. My Rooms")
     print("3. Update schedule")
-    print("4. Exit")
+    print("4. Update schedule from Fenix")
+    print("5. Exit")
     option = input("Option: ")
     try:
         if option == "1":
@@ -22,10 +23,6 @@ while True:
             roomExists = proxy.validateRoom(room_id)
             if roomExists == True:
                 print("That room already exists")
-                continue
-            realRoom = proxy.realRoom(room_id)
-            if realRoom == True:
-                print("Room added and schedule updated from Fenix API")
                 continue
             proxy.createRoom(name, room_id)
         elif option == "2":
@@ -47,6 +44,13 @@ while True:
                 break
             proxy.updateSchedule(room_id, weekday, slot_start, slot_end)
         elif option == "4":
+            room_id = input("room_id: ")
+            roomExists = proxy.validateRoom(room_id)
+            if roomExists == False:
+                print("There is no room with that id")
+                continue
+            proxy.updateFromFenix(room_id)
+        elif option == "5":
             break
         else:
             print("Invalid option")

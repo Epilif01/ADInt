@@ -34,7 +34,7 @@ class Menu(Base):
     __tablename__ = 'menu'
     id = Column(Integer, primary_key=True)
     item = Column(String, nullable=False)
-    restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
+    restaurant_id = Column(Integer, ForeignKey('restaurant.room_id'))
     restaurant = relationship("Restaurant", back_populates="menu")
     def __repr__(self):
         return "<Menu(item='%s')>" % (self.item)
@@ -44,7 +44,7 @@ class Review(Base):
     __tablename__ = 'review'
     id = Column(Integer, primary_key=True)
     review = Column(String, nullable=False)
-    restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
+    restaurant_id = Column(Integer, ForeignKey('restaurant.room_id'))
     restaurant = relationship("Restaurant", back_populates="review")
     def __repr__(self):
         return "<Review(review='%s')>" % (self.review)
