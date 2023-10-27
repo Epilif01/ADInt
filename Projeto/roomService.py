@@ -13,6 +13,14 @@ handler.connect(app, "/api")
 def createRoom(name, room_id):
     if db.findRoom(room_id) == None:
         db.createRoom(name, room_id)
+        url = "http://localhost:8000/api"
+        data = {"link": "%s" % room_id}
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url, json=data, headers=headers)
+        print(response.status_code)
+        print(response.json())
+        new_url = "http://localhost:8000/files/%s" % response.json()["filename"]
+        return new_url
 
 @handler.register
 def updateFromFenix(room_id):

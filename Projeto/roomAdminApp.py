@@ -24,7 +24,8 @@ while True:
             if roomExists == True:
                 print("That room already exists")
                 continue
-            proxy.createRoom(name, room_id)
+            qrcode = proxy.createRoom(name, room_id)
+            print("Get you QRCode at: %s in the next 2 minutes" % qrcode)
         elif option == "2":
             print(proxy.myRooms())
         elif option == "3":
