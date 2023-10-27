@@ -3,10 +3,10 @@ from xmlrpc import client
 proxy = client.ServerProxy("http://localhost:8002/api")
 
 print("Welcome to the Room Admin App")
-print("Please authenticate yourself")
+""" print("Please authenticate yourself")
 username = input("Username: ")
 print("Welcome %s" % username)
-
+ """
 while True:
     print("Please select an option:")
     print("1. Create room")
@@ -17,19 +17,24 @@ while True:
     try:
         if option == "1":
             name = input("Room name: ")
+            room_id = input("Room id: ")
 
-            roomExists = proxy.validateRoom(name, username)
+            roomExists = proxy.validateRoom(room_id)
             if roomExists == True:
                 print("That room already exists")
                 continue
-            proxy.createRoom(name, username)
+            realRoom = proxy.realRoom(room_id)
+            if realRoom == True:
+                print("Room added and schedule updated from Fenix API")
+                continue
+            proxy.createRoom(name, room_id)
         elif option == "2":
-            print(proxy.myRooms(username))
+            print(proxy.myRooms())
         elif option == "3":
-            name = input("Room name: ")
-            roomExists = proxy.validateRoom(name, username)
+            room_id = input("room_id: ")
+            roomExists = proxy.validateRoom(room_id)
             if roomExists == False:
-                print("You do not own a room with that name")
+                print("There is no room with that id")
                 continue
             weekday = input("Weekday: ")
             if weekday == "":
@@ -40,7 +45,7 @@ while True:
             slot_end = input("End time: ")
             if slot_end == "":
                 break
-            proxy.updateSchedule(name, weekday, slot_start, slot_end)
+            proxy.updateSchedule(room_id, weekday, slot_start, slot_end)
         elif option == "4":
             break
         else:

@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
 from flask_xmlrpcre.xmlrpcre import *
+import requests
 import roomS_DB as db
 
 app = Flask(__name__)
@@ -12,6 +13,21 @@ handler.connect(app, "/api")
 def createRoom(name, owner):
     if db.findRoom(name) == None:
         db.createRoom(name, owner)
+
+@handler.register
+def realRoom(room_id):
+    url = " https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/%s" % room_id 
+    
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify(data)
+        else:
+            return jsonify({"error": "Failed to fetch data from the API"}), 500
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @handler.register
