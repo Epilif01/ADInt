@@ -80,5 +80,30 @@ def list_check_ins_outs(user_id):
     )
 
 
+@app.route("/api/check_in/<path:place_id>/<path:user_id>")
+def check_inAPI(place_id, user_id):
+    if db.getCheckin(user_id) is not None:
+        return "User already checked in"
+    timeofcheckin = datetime.datetime.now()
+    timeofcheckout = None
+    db.new_checkin(place_id, user_id, timeofcheckin, timeofcheckout)
+    return jsonify({"status": "ok"})
+
+
+@app.route("/api/check_out/<path:user_id>")
+def check_outAPI(user_id):
+    timeofcheckout = datetime.datetime.now()
+    checkout_state = db.checkout(user_id, timeofcheckout)
+    if checkout_state == "No checkin found":
+        return "No checkin found"
+    return jsonify({"status": "ok"})
+
+
+@app.route("/api/checked_in/<path:place_id>")
+def checked_inAPI(place_id):
+    checked_in = db.getCheckedIn(place_id)
+    return jsonify(checked_in)
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8003, debug=True)
