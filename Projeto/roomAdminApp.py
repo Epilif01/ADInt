@@ -19,6 +19,7 @@ while True:
         if option == "1":
             name = input("Room name: ")
             room_id = input("Room id: ")
+            #validate room_id format
 
             roomExists = proxy.validateRoom(room_id)
             if roomExists == True:
@@ -43,7 +44,12 @@ while True:
             slot_end = input("End time: ")
             if slot_end == "":
                 break
-            proxy.updateSchedule(room_id, weekday, slot_start, slot_end)
+            data = {
+                "weekday": weekday,
+                "slot_start": slot_start,
+                "slot_end": slot_end
+            }
+            proxy.updateSchedule(room_id, data)
         elif option == "4":
             room_id = input("room_id: ")
             roomExists = proxy.validateRoom(room_id)

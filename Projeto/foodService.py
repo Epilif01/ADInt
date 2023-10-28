@@ -96,6 +96,14 @@ def review(name):
         return redirect('/restaurant/%s' % name)
     else:
         return render_template('review.html')
+    
+@app.route('/api/<room_id>/menu', methods=['GET'])
+def menuAPI(room_id):
+    restaurant = db.findRestaurant(room_id)
+    menu = []
+    for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.id):
+        menu.append(row.item)
+    return jsonify(menu)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8001, debug=True)
