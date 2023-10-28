@@ -60,6 +60,21 @@ def messages_received():
         print(messages)
         return render_template("show_message.html", messages=messages)
 
+@app.route("/api/sendmessage", methods=["POST"])
+def api_send_message():
+    user_id = request.form["user_id"]
+    message = request.form["message"]
+    destination = request.form["destination"]
+    db.new_message(user_id, message, destination)
+    return jsonify("Message sent")
+
+@app.route("/api/messagesreceived", methods=["POST"])
+def api_messages_received():
+    user_id = request.form["user_id"]
+    messages = {}
+    for row in db.messages_received(user_id):
+        messages[row.sender]= row.message
+    return jsonify(messages)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8004, debug=True)
