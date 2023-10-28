@@ -68,7 +68,7 @@ def myRooms():
 def updateSchedule(room_id, data):
     room = db.findRoom(room_id)
     if room != None:
-        db.deleteSchedule(room.id)
+        db.deleteSchedule(room_id)
 
     db.createSchedule(room_id, data)
 
@@ -94,6 +94,14 @@ def schedule(room_id):
     for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
         schedule.append((row.weekday, row.slot_start, row.slot_end))
     return render_template("schedule.html", schedule=schedule, room_id=room_id)
+
+
+@app.route("api/<room_id>/schedule")
+def scheduleAPI(room_id):
+    schedule = []
+    for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
+        schedule.append((row.weekday, row.slot_start, row.slot_end))
+    return jsonify(schedule)
 
 
 if __name__ == "__main__":

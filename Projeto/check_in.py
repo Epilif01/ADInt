@@ -80,7 +80,7 @@ def list_check_ins_outs(user_id):
     )
 
 
-@app.route("/api/check_in/<path:place_id>/<path:user_id>")
+@app.route("/api/check_in/<path:place_id>/<path:user_id>", methods=["POST"])
 def check_inAPI(place_id, user_id):
     if db.getCheckin(user_id) is not None:
         return "User already checked in"
@@ -90,7 +90,7 @@ def check_inAPI(place_id, user_id):
     return jsonify({"status": "ok"})
 
 
-@app.route("/api/check_out/<path:user_id>")
+@app.route("/api/check_out/<path:user_id>", methods=["POST"])
 def check_outAPI(user_id):
     timeofcheckout = datetime.datetime.now()
     checkout_state = db.checkout(user_id, timeofcheckout)

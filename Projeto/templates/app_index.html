@@ -58,6 +58,8 @@
 
         <div class="messagesMenu" id="screenToggle3" style="display:none;">
             <h2>Room: {{Room}}</h2>
+            <button class="btn btn-primary" id="checkInButton">Check in</button>
+            <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
             <h2>Users:</h2>
             <button class="btn btn-primary" id="refreshUsers">Refresh</button>
             <ul id="userlist"></ul>
@@ -74,24 +76,6 @@
 
 
     <script>
-
-        $("#refreshUsers").click(function () {
-            $("#userlist").empty();
-            $.ajax({
-                url: '/api/checked_in/{{Room}}',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    var users = JSON.parse(data);
-                    for (user in users) {
-                        $("#userlist").append("<li>" + user.id + "</li>");
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.log("Error: " + error);
-                }
-            });
-        });
 
         $("#QRCodeBTN").click(function () {
             $(".qrcodereader").toggle();
@@ -125,13 +109,61 @@
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
         html5QrcodeScanner.render(onScanSuccess);
 
+        $("#refreshUsers").click(function () {
+            $("#userlist").empty();
+            $.ajax({
+                url: '/api/checked_in/{{Room}}',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var users = JSON.parse(data);
+                    for (user in users) {
+                        $("#userlist").append("<li>" + user.id + "</li>");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
+        $("#checkInButton").click(function () {
+            $.ajax({
+                url: '/api/check_in/{{Room}}/{{current_user.id}}',
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $("#checkInButton").toggle();
+                    $("#checkOutButton").toggle();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
+        $("#checkOutButton").click(function () {
+            $.ajax({
+                url: '/api/check_out/{{current_user.id}}',
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $("#checkInButton").toggle();
+                    $("#checkOutButton").toggle();
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
         $("#screenToggle").click(function () {
             $("#screenToggle").toggle();
             $("#screenToggle1").toggle();
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
-
-            $("#refreshUsers").click();
 
             setTimeout(function () {
                 $("#refreshUsers").click();
