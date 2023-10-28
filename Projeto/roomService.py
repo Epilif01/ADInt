@@ -1,4 +1,11 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
+from flask import (
+    Flask,
+    render_template,
+    request,
+    send_from_directory,
+    redirect,
+    jsonify,
+)
 from flask_xmlrpcre.xmlrpcre import *
 import requests
 import roomS_DB as db
@@ -22,15 +29,16 @@ def createRoom(name, room_id):
         new_url = "http://localhost:8000/files/%s" % response.json()["filename"]
         return new_url
 
+
 @handler.register
 def updateFromFenix(room_id):
-    url = " https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/%s" % room_id 
-    
+    url = " https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/%s" % room_id
+
     try:
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            updateSchedule(room_id, data['events'])                  
+            updateSchedule(room_id, data["events"])
         else:
             return jsonify({"error": "Failed to fetch data from the API"}), 500
 
@@ -59,9 +67,10 @@ def myRooms():
 @handler.register
 def updateSchedule(room_id, data):
     room = db.findRoom(room_id)
-    if room_id != None:
-       db.deleteSchedule(room.id)
-    db.createSchedule(room.id, data)
+    if room != None:
+        db.deleteSchedule(room.id)
+
+    db.createSchedule(room_id, data)
 
 
 @app.route("/")
@@ -69,7 +78,7 @@ def updateSchedule(room_id, data):
 def index():
     rooms = []
     for row in db.session.query(db.Room):
-        rooms.append(row.name, row.room_id)
+        rooms.append((row.name, row.room_id))
     return render_template("roomserviceapp.html", rooms=rooms)
 
 
@@ -82,7 +91,7 @@ def room(room_id):
 def schedule(room_id):
     room = db.findRoom(room_id)
     schedule = []
-    for row in db.session.query(db.Schedule).filter_by(room_id=room.id):
+    for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
         schedule.append((row.weekday, row.slot_start, row.slot_end))
     return render_template("schedule.html", schedule=schedule, room_id=room_id)
 

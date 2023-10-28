@@ -7,7 +7,7 @@ print("Welcome to the Food Admin App")
 username = input("Username: ") """
 
 
-#print("\n\nWelcome %s!" % username)
+# print("\n\nWelcome %s!" % username)
 
 while True:
     print("\nPlease select an option:")
@@ -47,7 +47,7 @@ while True:
                 menu.append(item)
             proxy.updateMenu(room_id, menu)
         elif option == "4":
-            name = input("Restaurant room_id: ")
+            room_id = input("Restaurant room_id: ")
             restaurantExists = proxy.validateRestaurant(room_id)
             if restaurantExists == False:
                 print("There is not a restaurant with that room_id")
