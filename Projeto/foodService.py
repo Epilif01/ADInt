@@ -82,7 +82,7 @@ def restaurant(name):
 def menu(name):
     restaurant = db.findRestaurant(name)
     menu = []
-    for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.id):
+    for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.room_id):
         menu.append(row.item)
     return render_template('menu.html', menu=menu, restaurant=name)
 
@@ -90,7 +90,7 @@ def menu(name):
 def review(name):
     if request.method == 'POST':
         restaurant = db.findRestaurant(name)
-        review = db.Review(restaurant_id=restaurant.id, review=request.form['review'])
+        review = db.Review(restaurant_id=restaurant.room_id, review=request.form['review'])
         db.session.add(review)
         db.session.commit()
         return redirect('/restaurant/%s' % name)
@@ -101,9 +101,17 @@ def review(name):
 def menuAPI(room_id):
     restaurant = db.findRestaurant(room_id)
     menu = []
-    for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.id):
+    for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.room_id):
         menu.append(row.item)
     return jsonify(menu)
+
+@app.route('/api/<room_id>/review', methods=['POST'])
+def reviewAPI(room_id):
+    restaurant = db.findRestaurant(room_id)
+    review = db.Review(restaurant_id=restaurant.room_id, review=request.form['review'])
+    db.session.add(review)
+    db.session.commit()
+    return jsonify({'status': 'ok'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8001, debug=True)
