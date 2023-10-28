@@ -18,7 +18,7 @@ def createRestaurant(name, room_id):
         db.createRestaurant(name, room_id)
         url = "http://localhost:8000/api"
         data = {
-        "link": "%s" % room_id
+        "link": "r%s" % room_id
         }   
         headers = {
         "Content-Type": "application/json"

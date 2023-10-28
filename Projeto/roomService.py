@@ -14,7 +14,7 @@ def createRoom(name, room_id):
     if db.findRoom(room_id) == None:
         db.createRoom(name, room_id)
         url = "http://localhost:8000/api"
-        data = {"link": "%s" % room_id}
+        data = {"link": "s%s" % room_id}
         headers = {"Content-Type": "application/json"}
         response = requests.post(url, json=data, headers=headers)
         print(response.status_code)
@@ -59,8 +59,8 @@ def myRooms():
 @handler.register
 def updateSchedule(room_id, data):
     room = db.findRoom(room_id)
-    #if room_id != None:
-    #   db.deleteSchedule(room.id)
+    if room_id != None:
+       db.deleteSchedule(room.id)
     db.createSchedule(room.id, data)
 
 
