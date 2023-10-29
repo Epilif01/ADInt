@@ -189,12 +189,13 @@
 
         $("#sendMessageBt").click(function () {
             $.ajax({
-                url: '/api/send_message/{{Room}}/{{current_user.istid}}/',
+                url: '/api/sendmessage/{{current_user.istid}}',
                 type: 'POST',
-                data: JSON.stringify({
-                    "destination": $(".userList").val(),
+                data:JSON.stringify({
+                    "destination": $(".userList").dropdown('get value'),
                     "message": $("#message").val()
                 }),
+                contentType: 'application/json',
                 dataType: 'json',
                 success: function (data) {
                     console.log(data);
@@ -218,8 +219,10 @@
                     console.log(data);
                     // Handle the successful response and format the messages
                     const messageList = $('#messageList');
-                    for (const sender in data) {
-                        const message = data[sender];
+                    messageList.empty();
+                    for (const pair of data) {
+                        const message = pair[1];
+                        const sender = pair[0];
                         const formattedMessage = `${sender}: ${message}`;
                         messageList.append(`<li>${formattedMessage}</li>`);
                         console.log(formattedMessage);
@@ -278,6 +281,7 @@
             $("#screenToggle1").toggle();
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
+            $("#refreshUsers").click();
 
             setTimeout(function () {
                 $("#refreshMessages").click();

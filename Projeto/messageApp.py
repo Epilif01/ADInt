@@ -62,17 +62,25 @@ def messages_received():
 
 @app.route("/api/sendmessage/<user_id>", methods=["POST"])
 def api_send_message(user_id):
-    message = request.json["message"]
-    destination = request.json["destination"]
-    db.new_message(user_id, message, destination)
-    return jsonify("Message sent")
+    try:
+        print("entrei aqui")
+        print(request)
+        message = request.json["message"]
+        destination = request.json["destination"]
+        print(message)
+        print(destination)
+        db.new_message(user_id, message, destination)
+        return jsonify({"message": "Message sent"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 @app.route("/api/messagesreceived/<user_id>", methods=["GET"])
 def api_messages_received(user_id):
     #user_id = request.form["user_id"]
-    messages = {}
+    messages = []
     for row in db.messages_received(user_id):
-        messages[row.sender]= row.message
+        messages.append((row.sender,row.message))
     return jsonify(messages)
 
 if __name__ == "__main__":

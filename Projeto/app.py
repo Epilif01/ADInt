@@ -51,6 +51,12 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), nullable=True)
     token = db.Column(db.String(300))
 
+class Enrollments(db.Model):
+    __tablename__ = "enrollments"
+    id = db.Column(db.Integer, primary_key=True)
+    courseid = db.Column(db.Integer, nullable=False)
+    istid = db.Column(db.String(64), nullable=False)    
+
 
 @login.user_loader
 def load_user(id):
@@ -119,16 +125,27 @@ def schedule(room_id):
 
 @app.route("/api/sendmessage/<user_id>", methods=["POST"])
 def api_send_message(user_id):
-    return jsonify(
-        requests.post(
+    try:
+        message = request.json["message"]
+        destination = request.json["destination"]
+        
+        # Forward the request to the Send Messages Server
+        response = requests.post(
             "http://localhost:8004/api/sendmessage/%s" % user_id,
-            data=request.json,
-            headers={
-                "Accept": "application/json",
+            json={
+                "message": message,
+                "destination": destination
             },
-        ).json()
-    )
+            headers={
+                "Content-Type": "application/json"
+            }
+        )
+        
+        # Return the response from the Send Messages Server to the browser
+        return jsonify(response.json())
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/messagesreceived/<user_id>", methods=["GET"])
 def api_messages_received(user_id):
@@ -282,6 +299,26 @@ def oauth2_callback(provider):
         )
         db.session.add(user)
         db.session.commit()
+
+    response = requests.get(
+        "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person/courses",
+        headers={
+            "Authorization": "Bearer " + oauth2_token,
+            "Accept": "application/json",
+        },
+    ) 
+    if response.status_code != 200:
+        abort(401)
+    courses = response.json()["enrolments"]
+    for course in courses:
+        courseid = course["id"]
+        enroll = db.session.scalar(db.select(Enrollments).where(Enrollments.courseid == courseid))
+        if enroll is None:
+            enroll = Enrollments(
+                courseid=courseid, istid=istid
+            )
+            db.session.add(enroll)
+            db.session.commit()
 
     # log the user in
     login_user(user)
