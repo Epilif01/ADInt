@@ -96,7 +96,7 @@ def schedule(room_id):
     return render_template("schedule.html", schedule=schedule, room_id=room_id)
 
 
-@app.route("api/<room_id>/schedule")
+@app.route("/api/<room_id>/schedule")
 def scheduleAPI(room_id):
     schedule = []
     for row in db.session.query(db.Schedule).filter_by(room_id=room_id):

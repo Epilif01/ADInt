@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 from dotenv import load_dotenv
 from flask import Flask, redirect, url_for, render_template, flash, session, \
-    current_app, request, abort
+    current_app, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user,\
     current_user
@@ -68,6 +68,24 @@ def other_route():
         return "returned name "+user_info['name']
     except:
          abort(401, "not logged in in FLASK")
+
+
+
+
+@app.route("/api/<room_id>/schedule")
+def schedule(room_id):
+    return jsonify(requests.get("http://localhost:8002/api/%s/schedule" % room_id,
+                        headers={
+                            'Accept': 'application/json',
+                        }).json())
+
+
+@app.route("/api/messagesreceived/<user_id>", methods=["GET"])
+def api_messages_received(user_id):
+    return requests.get("http://localhost:8004/api/messagesreceived/%s" % user_id,
+                        headers={
+                            'Accept': 'application/json',
+                        })
 
 
 @app.route('/logout')

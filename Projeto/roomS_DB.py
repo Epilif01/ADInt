@@ -42,7 +42,7 @@ class Schedule(Base):
     name = Column(String, nullable=False)
     course_id = Column(Integer, nullable=True)
     type = Column(String, nullable=False)
-    place_id = Column(Integer, ForeignKey("room.room_id"))
+    room_id = Column(Integer, ForeignKey("room.room_id"))
     room = relationship("Room", back_populates="schedule")
 
     def __repr__(self):
@@ -81,7 +81,7 @@ def createSchedule(room_id, data):
             weekday=event["weekday"],
             slot_start=event["start"],
             slot_end=event["end"],
-            place_id=room_id,
+            room_id=room_id,
             name=name,
             course_id=course_id,
             type=event["type"],

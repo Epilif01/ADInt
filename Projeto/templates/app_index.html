@@ -94,7 +94,7 @@
             //alert(`Scan result: ${decodedText}`, decodedResult);
             $(".info").show();
 
-            let url = "http://localhost:8003/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
+            let url = "/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
 
             $("#info").click(function () {
                 $.ajax({
@@ -150,7 +150,7 @@
         $("#refreshMessages").click(function () {
             $("#messagelist").empty();
             $.ajax({
-                url: 'http://localhost:8004/api/messagesreceived/{{current_user.id}}',
+                url: '/api/messagesreceived/{{current_user.id}}',
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
