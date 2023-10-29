@@ -31,6 +31,7 @@ class Book(Base):
     user_id = Column(String, nullable=False)
     timeofcheckin = Column(Date, nullable=False)
     timeofcheckout = Column(Date, nullable=True)
+    user_name = Column(String, nullable=False)
 
     def __repr__(self):
         return (
@@ -45,12 +46,13 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def new_checkin(place_id, user_id, timeofcheckin, timeofcheckout):
+def new_checkin(place_id, user_id, timeofcheckin, timeofcheckout, user_name):
     book = Book(
         place_id=place_id,
         user_id=user_id,
         timeofcheckin=timeofcheckin,
         timeofcheckout=timeofcheckout,
+        user_name=user_name,
     )
     session.add(book)
     session.commit()
