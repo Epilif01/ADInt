@@ -6,6 +6,9 @@
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"> </script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.8.8/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.8.8/semantic.min.js"></script>
 </head>
 
 <body>
@@ -89,18 +92,24 @@
             //alert(`Scan result: ${decodedText}`, decodedResult);
             $(".info").show();
 
+            let url = "http://localhost:8003/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
+
             $("#info").click(function () {
                 $.ajax({
-                    url: decodedText,
+                    url: url,
                     type: "GET",
                     success: function (data) {
                         console.log(data);
                         alert(data);
                         data = JSON.parse(data);
-                        if (data.id == "room") {
-
-                        } else if (data.id == "restaurant") {
-
+                        if (decodedText[0] == 's') {
+                            for (slot in data) {
+                                $("#info").append("<li>" + slot + "</li>");
+                            }
+                        } else if (decodedText[s] == 'r') {
+                            for (item in data) {
+                                $("#info").append("<li>" + item + "</li>");
+                            }
                         }
                     },
                     failure: function (errMsg) {
