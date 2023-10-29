@@ -72,9 +72,12 @@
             <h2 id="roomId"></h2>
             <button class="btn btn-primary" id="checkInButton">Check in</button>
             <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
-            <div class="ui dropdown" id="userList">
-                <div class="text">Select User</div>
+            <h2>Users:</h2>
+            <button class="btn btn-primary" id="refreshUsers">Refresh</button>
+            <div class="ui selection dropdown userList" id="userDropdown">
+                <input type="hidden" name="user">
                 <i class="dropdown icon"></i>
+                <div class="default text">Select User</div>
                 <div class="menu">
                 </div>
             </div>
@@ -90,6 +93,7 @@
 
         </div>
     </div>
+
 
 
     <script>
@@ -132,27 +136,31 @@
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
         html5QrcodeScanner.render(onScanSuccess);
 
-        $("#userList").dropdown({
-            onShow: function () {
-                $("#userList .menu").empty();
-                $.ajax({
-                    url: '/api/checked_in/' + $("#roomId").text(),
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        var books = JSON.parse(data);
-                        for (book in books) {
-                            $("#userList .menu").append("<div class='item' data-value='" + book.user_id + "'>" + book.user_name + "</div>");
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Error: " + error);
+        $("#refreshUsers").click(function () {
+            $(".menu").empty();
+            $.ajax({
+                url: '/api/checked_in/' + $("#roomId").text(),
+                type: 'GET',
+                // dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    // Handle the successful response and format the messages
+                    const userList = $('.menu');
+                    for (const user_id of data) {
+                        const formattedUser = `<div class="item" data-value="${user_id}">${user_id}</div>`;
+                        userList.append(formattedUser);
+                        console.log(formattedUser);
                     }
-                });
-            },
-            onActionable: function (value, text, $selectedItem) {
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
+        $(".userList").dropdown({
+            onChange: function (value, text, $selectedItem) {
                 $("#messageForm").show();
-                { { destination = value } }
             }
         });
 
@@ -162,7 +170,7 @@
                 url: '/api/send_message/{{Room}}/{{current_user.istid}}/',
                 type: 'POST',
                 data: JSON.stringify({
-                    "destination": $("#userList").val(),
+                    "destination": $(".userList").val(),
                     "message": $("#message").val()
                 }),
                 dataType: 'json',

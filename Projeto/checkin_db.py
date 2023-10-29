@@ -83,8 +83,5 @@ def getCheckinsouts(user_id):
 
 
 def getCheckedIn(place_id):
-    book = session.query(Book).filter_by(place_id=place_id, timeofcheckout=None).all()
-    if book is None:
-        return None
-    else:
-        return book
+    book = session.query(Book).filter_by(place_id=place_id, timeofcheckout=None)
+    return book
