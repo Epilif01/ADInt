@@ -62,8 +62,8 @@ def messages_received():
 
 @app.route("/api/sendmessage/<user_id>", methods=["POST"])
 def api_send_message(user_id):
-    message = request.form["message"]
-    destination = request.form["destination"]
+    message = request.json["message"]
+    destination = request.json["destination"]
     db.new_message(user_id, message, destination)
     return jsonify("Message sent")
 

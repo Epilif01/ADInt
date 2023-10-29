@@ -72,6 +72,14 @@ def other_route():
 
 
 
+@app.route('/api/<room_id>/menu', methods=['GET'])
+def menuAPI(room_id):
+    return jsonify(requests.get("http://localhost:8000/api/%s/menu" % room_id,
+                        headers={
+                            'Accept': 'application/json',
+                        }).json())
+
+
 
 @app.route("/api/<room_id>/schedule")
 def schedule(room_id):

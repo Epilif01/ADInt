@@ -63,17 +63,17 @@
             <h2>Room: {{Room}}</h2>
             <button class="btn btn-primary" id="checkInButton">Check in</button>
             <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
-            <!-- <div class="ui dropdown" id="userList">
+            <div class="ui dropdown" id="userList">
                 <div class="text">Select User</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
                 </div>
-            </div> -->
+            </div>
             <div class="ui form" style="display:none;" id="messageForm">
                 <div class="field">
                     <textarea id="message" rows="2" placeholder="Type your message..."></textarea>
                 </div>
-                <button class="ui primary button" type="submit">Send</button>
+                <button class="ui primary button" id="sendMessageBt">Send</button>
             </div>
             <h2>Messages:</h2>
             <button class="btn btn-primary" id="refreshMessages">Refresh</button>
@@ -122,7 +122,7 @@
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
         html5QrcodeScanner.render(onScanSuccess);
 
-        /* $("#userList").dropdown({
+        $("#userList").dropdown({
             onShow: function () {
                 $("#userList .menu").empty();
                 $.ajax({
@@ -144,7 +144,28 @@
                 $("#messageForm").show();
                 { { destination = value } }
             }
-        }); */
+        });
+
+
+        $("#sendMessageBt").click(function () {
+            $.ajax({
+                url: '/api/send_message/{{Room}}/{{current_user.istid}}/',
+                type: 'POST',
+                data : JSON.stringify({
+                    "destination": $("#userList").val(),
+                    "message": $("#message").val()
+                }),
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $("#message").val("");
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
 
         $("#refreshMessages").click(function () {
             $("#messagelist").empty();
@@ -153,8 +174,6 @@
                 type: 'GET',
                 // dataType: 'json',
                 success: function (data) {
-                    console.log("{{current_user.id}}");
-                    console.log(data);
                     // Handle the successful response and format the messages
                     const messageList = $('#messageList');
                     for (const sender in data) {
