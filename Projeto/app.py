@@ -87,6 +87,13 @@ def other_route():
     except:
         abort(401, "not logged in in FLASK")
 
+@app.route("/api/<user_id>/courses")
+def coursesAPI(user_id):
+    data = db.session.query(Enrollments).filter_by(istid=user_id)
+    courses = []
+    for row in data:
+        courses.append(row.courseid)
+    return jsonify(courses)
 
 @app.route("/api/<room_id>/menu", methods=["GET"])
 def menuAPI(room_id):
