@@ -38,7 +38,7 @@
         <h2>Hi, {{ current_user.username }}!</h2>
         <div class="buttonContainer" display="flex">
             <a class="btn btn-primary" href="{{ url_for('logout') }}">Logout</a>
-            <button class="btn btn-primary" id="screenToggle">Messages</button>
+            <button class="btn btn-primary" id="screenToggle" style="display: none;">Messages</button>
             <button class="btn btn-primary" id="screenToggle1" style="display:none;">Main</button>
         </div>
         {% else %}
@@ -53,6 +53,14 @@
             <div class="qrcodereader" style="width: 500px; display:none;" id="reader"></div>
 
 
+            <div class="ui form" style="display:none;" id="reviewForm">
+                <div class="field">
+                    <textarea id="review" rows="2" placeholder="Type your review..."></textarea>
+                </div>
+                <button class="ui primary button" id="sendReviewBt">Send</button>
+            </div>
+
+            
             <div class="info" style="display:none;" id="info">
                 <h2>INFO</h2>
                 <a class="btn btn-primary" id="info">Info</a>
@@ -94,7 +102,7 @@
             console.log(`Scan result: ${decodedText}`, decodedResult);
             //alert(`Scan result: ${decodedText}`, decodedResult);
             $(".info").show();
-
+            $("#screenToggle").toggle();
             let url = "/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
 
             $.ajax({

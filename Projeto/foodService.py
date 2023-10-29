@@ -105,10 +105,10 @@ def menuAPI(room_id):
         menu.append(row.item)
     return jsonify(menu)
 
-@app.route('/api/<room_id>/review', methods=['POST'])
+@app.route('/api/<room_id>/review/<user_id>', methods=['POST'])
 def reviewAPI(room_id):
     restaurant = db.findRestaurant(room_id)
-    review = db.Review(restaurant_id=restaurant.room_id, review=request.form['review'])
+    review = db.Review(restaurant_id=restaurant.room_id, review=request.json['review'])
     db.session.add(review)
     db.session.commit()
     return jsonify({'status': 'ok'})
