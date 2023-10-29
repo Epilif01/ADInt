@@ -52,6 +52,8 @@
             <button class="btn btn-primary" id="QRCodeBTN">Read QRCode</button>
             <div class="qrcodereader" style="width: 500px; display:none;" id="reader"></div>
 
+            <button class="btn btn-primary" id="checkInButton" style="display:none;">Check in</button>
+            <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
 
             <div class="ui form" style="display:none;" id="reviewForm">
                 <div class="field">
@@ -60,7 +62,7 @@
                 <button class="ui primary button" id="sendReviewBt">Send</button>
             </div>
 
-            
+
             <div class="info" style="display:none;" id="info">
                 <h2>INFO</h2>
                 <a class="btn btn-primary" id="info">Info</a>
@@ -70,8 +72,6 @@
 
         <div class="messagesMenu" id="screenToggle3" style="display:none;">
             <h2 id="roomId"></h2>
-            <button class="btn btn-primary" id="checkInButton">Check in</button>
-            <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
             <h2>Users:</h2>
             <button class="btn btn-primary" id="refreshUsers">Refresh</button>
             <div class="ui selection dropdown userList" id="userDropdown">
@@ -105,8 +105,11 @@
             // Handle on success condition with the decoded text or result.
             console.log(`Scan result: ${decodedText}`, decodedResult);
             //alert(`Scan result: ${decodedText}`, decodedResult);
+            $("#checkInButton").show();
+            $("#checkOutButton").hide();
+            $("#reviewForm").hide();
+            $("#screenToggle").hide();
             $(".info").show();
-            $("#screenToggle").toggle();
             let url = "/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
 
             $.ajax({
@@ -121,15 +124,34 @@
                         for (slot of data) {
                             $("#infoText").append("<li>" + slot + "</li>");
                         }
-                    } else if (decodedText[s] == 'r') {
+                    } else if (decodedText[0] == 'r') {
                         for (item of data) {
                             $("#infoText").append("<li>" + item + "</li>");
                         }
                     }
-                    $("#roomId").text(decodedText.substring(1));
+                    $("#roomId").text(decodedText);
                 },
                 failure: function (errMsg) {
                     alert(errMsg);
+                }
+            });
+
+            $.ajax({
+                url: '/api/checked_in/' + decodedText.substring(1),
+                type: 'GET',
+                // dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    // Handle the successful response and format the messages
+                    const userList = $('.menu');
+                    for (const user_id of data) {
+                        const formattedUser = `<div class="item" data-value="${user_id}">${user_id}</div>`;
+                        userList.append(formattedUser);
+                        console.log(formattedUser);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
                 }
             });
         }
@@ -139,7 +161,7 @@
         $("#refreshUsers").click(function () {
             $(".menu").empty();
             $.ajax({
-                url: '/api/checked_in/' + $("#roomId").text(),
+                url: '/api/checked_in/' + $("#roomId").text().substring(1),
                 type: 'GET',
                 // dataType: 'json',
                 success: function (data) {
@@ -211,13 +233,21 @@
 
         $("#checkInButton").click(function () {
             $.ajax({
-                url: '/api/check_in/' + $("#roomId").text() + '/{{current_user.istid}}',
+                url: '/api/check_in/' + $("#roomId").text().substring(1) + '/{{current_user.istid}}',
                 type: 'POST',
                 dataType: 'json',
                 success: function (data) {
                     console.log(data);
-                    $("#checkInButton").toggle();
-                    $("#checkOutButton").toggle();
+                    $("#checkInButton").hide();
+                    $("#checkOutButton").show();
+                    if (data.status == "User already checked in") {
+                        alert("User already checked in");
+                    } else {
+                        $("#screenToggle").show();
+                        if ($("#roomId").text()[0] == 'r') {
+                            $("#reviewForm").show();
+                        }
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.log("Error: " + error);
@@ -232,8 +262,10 @@
                 dataType: 'json',
                 success: function (data) {
                     console.log(data);
-                    $("#checkInButton").toggle();
-                    $("#checkOutButton").toggle();
+                    $("#checkInButton").show();
+                    $("#checkOutButton").hide();
+                    $("#screenToggle").hide();
+                    $("#reviewForm").hide();
                 },
                 error: function (xhr, status, error) {
                     console.log("Error: " + error);
