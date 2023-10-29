@@ -38,6 +38,7 @@ login.login_view = 'index'
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
+    istid = db.Column(db.String(64), nullable=False)
     username = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=True)
     token = db.Column(db.String(300))
@@ -82,10 +83,10 @@ def schedule(room_id):
 
 @app.route("/api/messagesreceived/<user_id>", methods=["GET"])
 def api_messages_received(user_id):
-    return requests.get("http://localhost:8004/api/messagesreceived/%s" % user_id,
+    return jsonify(requests.get("http://localhost:8004/api/messagesreceived/%s" % user_id,
                         headers={
                             'Accept': 'application/json',
-                        })
+                        }).json())
 
 
 @app.route('/logout')
@@ -163,18 +164,20 @@ def oauth2_callback(provider):
         abort(401)
 
     # use the access token to get the user's email address
-    response = requests.get(provider_data['userinfo']['url'], headers={
+    response = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", headers={
         'Authorization': 'Bearer ' + oauth2_token,
         'Accept': 'application/json',
     })
     if response.status_code != 200:
         abort(401)
     email = provider_data['userinfo']['email'](response.json())
+    print(response)
+    istid = response.json()['username']
 
     # find or create the user in the database
     user = db.session.scalar(db.select(User).where(User.email == email))
     if user is None:
-        user = User(email=email, username=email.split('@')[0], token = oauth2_token)
+        user = User(email=email, username=email.split('@')[0], istid = istid, token = oauth2_token)
         db.session.add(user)
         db.session.commit()
 

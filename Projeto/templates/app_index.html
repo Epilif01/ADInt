@@ -77,7 +77,7 @@
             </div>
             <h2>Messages:</h2>
             <button class="btn btn-primary" id="refreshMessages">Refresh</button>
-            <ul id="messagelist"></ul>
+            <ul id="messageList"></ul>
 
         </div>
     </div>
@@ -150,13 +150,19 @@
         $("#refreshMessages").click(function () {
             $("#messagelist").empty();
             $.ajax({
-                url: '/api/messagesreceived/{{current_user.id}}',
+                url: '/api/messagesreceived/{{current_user.istid}}',
                 type: 'GET',
-                dataType: 'json',
+                // dataType: 'json',
                 success: function (data) {
-                    var messages = JSON.parse(data);
-                    for (message in messages) {
-                        $("#messagelist").append("<li>" + user.id + "</li>");
+                    console.log("{{current_user.id}}");
+                    console.log(data);
+                    // Handle the successful response and format the messages
+                    const messageList = $('#messageList');
+                    for (const sender in data) {
+                        const message = data[sender];
+                        const formattedMessage = `${sender}: ${message}`;
+                        messageList.append(`<li>${formattedMessage}</li>`);
+                        console.log(formattedMessage);
                     }
                 },
                 error: function (xhr, status, error) {
@@ -203,9 +209,9 @@
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
 
-            setTimeout(function () {
+/*             setTimeout(function () {
             $("#refreshMessages").click();
-            }, 5000);
+            }, 5000); */
         });
         $("#screenToggle1").click(function () {
             $("#screenToggle").toggle();
