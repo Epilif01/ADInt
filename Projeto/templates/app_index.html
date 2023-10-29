@@ -56,11 +56,12 @@
             <div class="info" style="display:none;" id="info">
                 <h2>INFO</h2>
                 <a class="btn btn-primary" id="info">Info</a>
+                <h2 id="infoText" style="display:none;"></h2>
             </div>
         </div>
 
         <div class="messagesMenu" id="screenToggle3" style="display:none;">
-            <h2>Room: {{Room}}</h2>
+            <h2 id="roomId"></h2>
             <button class="btn btn-primary" id="checkInButton">Check in</button>
             <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
             <div class="ui dropdown" id="userList">
@@ -96,27 +97,28 @@
 
             let url = "/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
 
-            $("#info").click(function () {
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    success: function (data) {
-                        console.log(data);
-                        $("#info").empty();
-                        if (decodedText[0] == 's') {
-                            for (slot of data) {
-                                $("#info").append("<li>" + slot + "</li>");
-                            }
-                        } else if (decodedText[s] == 'r') {
-                            for (item of data) {
-                                $("#info").append("<li>" + item + "</li>");
-                            }
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    console.log(data);
+                    $("#infoText").show();
+                    $("#infoText").empty();
+                    $("#infoText").append("<li>" + decodedText.substring(1) + "</li>");
+                    if (decodedText[0] == 's') {
+                        for (slot of data) {
+                            $("#infoText").append("<li>" + slot + "</li>");
                         }
-                    },
-                    failure: function (errMsg) {
-                        alert(errMsg);
+                    } else if (decodedText[s] == 'r') {
+                        for (item of data) {
+                            $("#infoText").append("<li>" + item + "</li>");
+                        }
                     }
-                });
+                    $("#roomId").text(decodedText.substring(1));
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
             });
         }
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
@@ -126,7 +128,7 @@
             onShow: function () {
                 $("#userList .menu").empty();
                 $.ajax({
-                    url: '/api/checked_in/{{Room}}',
+                    url: '/api/checked_in/' + $("#roomId").text(),
                     type: 'GET',
                     dataType: 'json',
                     success: function (data) {
@@ -139,7 +141,7 @@
                         console.log("Error: " + error);
                     }
                 });
-            }, 
+            },
             onActionable: function (value, text, $selectedItem) {
                 $("#messageForm").show();
                 { { destination = value } }
@@ -151,7 +153,7 @@
             $.ajax({
                 url: '/api/send_message/{{Room}}/{{current_user.istid}}/',
                 type: 'POST',
-                data : JSON.stringify({
+                data: JSON.stringify({
                     "destination": $("#userList").val(),
                     "message": $("#message").val()
                 }),
@@ -174,6 +176,8 @@
                 type: 'GET',
                 // dataType: 'json',
                 success: function (data) {
+                    console.log("{{current_user.istid}}");
+                    console.log(data);
                     // Handle the successful response and format the messages
                     const messageList = $('#messageList');
                     for (const sender in data) {
@@ -191,7 +195,7 @@
 
         $("#checkInButton").click(function () {
             $.ajax({
-                url: '/api/check_in/{{Room}}/{{current_user.istid}}',
+                url: '/api/check_in/' + $("#roomId").text() + '/{{current_user.istid}}',
                 type: 'POST',
                 dataType: 'json',
                 success: function (data) {
