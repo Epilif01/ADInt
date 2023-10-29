@@ -19,7 +19,7 @@ while True:
         if option == "1":
             name = input("Room name: ")
             room_id = input("Room id: ")
-            #validate room_id format
+            # validate room_id format
 
             roomExists = proxy.validateRoom(room_id)
             if roomExists == True:
@@ -30,26 +30,77 @@ while True:
         elif option == "2":
             print(proxy.myRooms())
         elif option == "3":
-            room_id = input("room_id: ")
-            roomExists = proxy.validateRoom(room_id)
-            if roomExists == False:
-                print("There is no room with that id")
-                continue
-            weekday = input("Weekday: ")
-            if weekday == "":
-                break
-            slot_start = input("Start time: ")
-            if slot_start == "":
-                break
-            slot_end = input("End time: ")
-            if slot_end == "":
-                break
-            data = {
-                "weekday": weekday,
-                "slot_start": slot_start,
-                "slot_end": slot_end
-            }
+            data = []
+            while True:
+                room_id = input("room_id: ")
+                roomExists = proxy.validateRoom(room_id)
+                if roomExists == False:
+                    print("There is no room with that id")
+                    continue
+
+                while True:
+                    weekday = input("Weekday: ")
+                    if weekday not in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
+                        break
+
+                    print("Invalid weekday")
+
+                while True:
+                    slot_start = input("Start time: ")
+                    hours = int(slot_start.split(":")[0])
+                    minutes = int(slot_start.split(":")[1])
+                    if hours >= 0 and hours <= 23 and minutes >= 0 and minutes <= 59:
+                        break
+
+                    print("Invalid time")
+
+                while True:
+                    slot_end = input("End time: ")
+                    hours = int(slot_end.split(":")[0])
+                    minutes = int(slot_end.split(":")[1])
+                    if hours >= 0 and hours <= 23 and minutes >= 0 and minutes <= 59:
+                        break
+
+                    print("Invalid time")
+
+                while True:
+                    type = input("Type: ")
+                    if type in ["GENERIC", "LESSON", "EXAM"]:
+                        break
+
+                    print("Invalid type")
+
+                if type == "GENERIC":
+                    name = input("Name: ")
+                    course_id = None
+
+                else:
+                    name = input("Course name: ")
+                    while True:
+                        course_id = input("Course id: ")
+                        if course_id.isdigit():
+                            break
+
+                        print("Invalid course id")
+
+                data.append(
+                    {
+                        "weekday": weekday,
+                        "slot_start": slot_start,
+                        "slot_end": slot_end,
+                        "name": name,
+                        "type": type,
+                        "course_id": course_id,
+                    }
+                )
+
+                loop = input("Add another event? ([Y]/n): ")
+                if loop == "n":
+                    break
+
             proxy.updateSchedule(room_id, data)
+            print("Schedule updated")
+
         elif option == "4":
             room_id = input("room_id: ")
             roomExists = proxy.validateRoom(room_id)

@@ -39,6 +39,9 @@ class Schedule(Base):
     slot_start = Column(String, nullable=False)
     slot_end = Column(String, nullable=False)
     weekday = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    course_id = Column(Integer, nullable=True)
+    type = Column(String, nullable=False)
     place_id = Column(Integer, ForeignKey("room.room_id"))
     room = relationship("Room", back_populates="schedule")
 
@@ -71,11 +74,17 @@ def myRooms():
 
 def createSchedule(room_id, data):
     for event in data:
+        name = event["title"] if event["type"] == "GENERIC" else event["course"]["name"]
+        course_id = None if event["type"] == "GENERIC" else event["course"]["id"]
+
         schedule = Schedule(
             weekday=event["weekday"],
-            slot_start=event["slot_start"],
-            slot_end=event["slot_end"],
+            slot_start=event["start"],
+            slot_end=event["end"],
             place_id=room_id,
+            name=name,
+            course_id=course_id,
+            type=event["type"],
         )
         session.add(schedule)
     session.commit()

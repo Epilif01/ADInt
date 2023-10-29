@@ -39,13 +39,18 @@ while True:
                 continue
             menu = []
             while True:
-                item = input("Item (or type 'close' to finish): ")
-                if item == "close":
-                    break
-                elif item == "":
+                item = input("Item: ")
+                if item == "":
                     continue
+
                 menu.append(item)
+
+                loop = input("Add another item? ([Y]/n): ")
+                if loop == "n":
+                    break
+
             proxy.updateMenu(room_id, menu)
+
         elif option == "4":
             room_id = input("Restaurant room_id: ")
             restaurantExists = proxy.validateRestaurant(room_id)
