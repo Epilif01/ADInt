@@ -38,7 +38,7 @@ class Schedule(Base):
     id = Column(Integer, primary_key=True)
     slot_start = Column(String, nullable=False)
     slot_end = Column(String, nullable=False)
-    weekday = Column(String, nullable=False)
+    day = Column(String, nullable=False)
     name = Column(String, nullable=False)
     course_id = Column(Integer, nullable=True)
     type = Column(String, nullable=False)
@@ -46,7 +46,7 @@ class Schedule(Base):
     room = relationship("Room", back_populates="schedule")
 
     def __repr__(self):
-        return f"<Schedule(weekday='{self.weekday}, slot_start={self.slot_start}, slot_end={self.slot_end}')>"
+        return f"<Schedule(day='{self.day}, slot_start={self.slot_start}, slot_end={self.slot_end}')>"
 
 
 Room.schedule = relationship("Schedule", order_by=Schedule.id, back_populates="room")
@@ -78,7 +78,7 @@ def createSchedule(room_id, data):
         course_id = None if event["type"] == "GENERIC" else event["course"]["id"]
 
         schedule = Schedule(
-            weekday=event["weekday"],
+            day=event["day"],
             slot_start=event["start"],
             slot_end=event["end"],
             room_id=room_id,
