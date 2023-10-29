@@ -1,4 +1,5 @@
 from xmlrpc import client
+import datetime as dt
 
 proxy = client.ServerProxy("http://localhost:8002/api")
 
@@ -39,11 +40,12 @@ while True:
                     continue
 
                 while True:
-                    weekday = input("Weekday: ")
-                    if weekday not in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
+                    day = input("day: ")
+                    try:
+                        dt.datetime.strptime(day, "%d/%m/%Y")
                         break
-
-                    print("Invalid weekday")
+                    except:
+                        print("Invalid day")
 
                 while True:
                     slot_start = input("Start time: ")
@@ -85,7 +87,7 @@ while True:
 
                 data.append(
                     {
-                        "weekday": weekday,
+                        "day": day,
                         "slot_start": slot_start,
                         "slot_end": slot_end,
                         "name": name,
