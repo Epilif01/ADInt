@@ -89,19 +89,22 @@ def room(room_id):
 
 @app.route("/room/<room_id>/schedule")
 def schedule(room_id):
-    room = db.findRoom(room_id)
     schedule = []
     for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
-        schedule.append((row.weekday, row.slot_start, row.slot_end))
+        schedule.append((row.day, row.slot_start, row.slot_end))
     return render_template("schedule.html", schedule=schedule, room_id=room_id)
 
 
 @app.route("/api/<room_id>/schedule")
 def scheduleAPI(room_id):
+    room = db.findRoom(room_id)
     schedule = []
     for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
-        schedule.append((row.weekday, row.slot_start, row.slot_end))
-    return jsonify(schedule)
+        schedule.append(
+            (row.name, row.course_id, row.day, row.slot_start, row.slot_end)
+        )
+
+    return jsonify({"name": room.name, "schedule": schedule})
 
 
 if __name__ == "__main__":

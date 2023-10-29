@@ -20,7 +20,9 @@
     <div class="container mt-3">
         {% if current_user.is_authenticated %}
         <div class="alert alert-info" role="alert">FENIX Authenticated</div>
+        <script>var authenticated = true</script>
         {% else %}
+        <script>var authenticated = false</script>
         <div class="alert alert-danger" role="alert">NOT FENIX Authenticated</div>
         {% endif %}
 
@@ -71,7 +73,7 @@
         </div>
 
         <div class="messagesMenu" id="screenToggle3" style="display:none;">
-            <h2 id="roomId"></h2>
+            <h2 id="roomName"></h2>
             <h2>Users:</h2>
             <button class="btn btn-primary" id="refreshUsers">Refresh</button>
             <div class="ui selection dropdown userList" id="userDropdown">
@@ -98,6 +100,8 @@
 
     <script>
 
+        let roomId = ""
+
         $("#QRCodeBTN").click(function () {
             $(".qrcodereader").toggle();
         });
@@ -105,12 +109,17 @@
             // Handle on success condition with the decoded text or result.
             console.log(`Scan result: ${decodedText}`, decodedResult);
             //alert(`Scan result: ${decodedText}`, decodedResult);
-            $("#checkInButton").show();
+            if (authenticated) {
+                $("#checkInButton").show();
+            }
+
             $("#checkOutButton").hide();
             $("#reviewForm").hide();
             $("#screenToggle").hide();
             $(".info").show();
             let url = "/api/" + (decodedText[0] == 's' ? decodedText.substring(1) + "/schedule" : decodedText.substring(1) + "/menu")
+
+            roomId = decodedText;
 
             $.ajax({
                 url: url,
@@ -118,40 +127,36 @@
                 success: function (data) {
                     console.log(data);
                     $("#infoText").show();
-                    $("#infoText").empty();
-                    $("#infoText").append("<li>" + decodedText.substring(1) + "</li>");
+                    $("#infoText").text(data.name + '\n');
+                    $("#roomName").text(data.name);
                     if (decodedText[0] == 's') {
-                        for (slot of data) {
-                            $("#infoText").append("<li>" + slot + "</li>");
+                        let course_ids = []
+                        $.ajax({
+                            url: "/api/{{current_user.istid}}/courses",
+                            type: "GET",
+                            success: function (data) {
+                                console.log(data);
+                                for (course_id of data) {
+                                    course_ids.push(course_id);
+                                }
+                            },
+                        });
+                        for (slot of data.schedule) {
+                            const formattedSlot = slot[0] + " (" + slot[3] + " - " + slot[4] + ", " + slot[2] + ")";
+                            if (course_ids.includes(slot[1])) {
+                                $("#infoText").append("<li>" + formattedSlot + " - ENROLLED</li>");
+                            } else {
+                                $("#infoText").append("<li>" + formattedSlot + "</li>");
+                            }
                         }
                     } else if (decodedText[0] == 'r') {
-                        for (item of data) {
+                        for (item of data.menu) {
                             $("#infoText").append("<li>" + item + "</li>");
                         }
                     }
-                    $("#roomId").text(decodedText);
                 },
                 failure: function (errMsg) {
                     alert(errMsg);
-                }
-            });
-
-            $.ajax({
-                url: '/api/checked_in/' + decodedText.substring(1),
-                type: 'GET',
-                // dataType: 'json',
-                success: function (data) {
-                    console.log(data);
-                    // Handle the successful response and format the messages
-                    const userList = $('.menu');
-                    for (const user_id of data) {
-                        const formattedUser = `<div class="item" data-value="${user_id}">${user_id}</div>`;
-                        userList.append(formattedUser);
-                        console.log(formattedUser);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.log("Error: " + error);
                 }
             });
         }
@@ -161,7 +166,7 @@
         $("#refreshUsers").click(function () {
             $(".menu").empty();
             $.ajax({
-                url: '/api/checked_in/' + $("#roomId").text().substring(1),
+                url: '/api/checked_in/' + roomId.substring(1),
                 type: 'GET',
                 // dataType: 'json',
                 success: function (data) {
@@ -191,7 +196,7 @@
             $.ajax({
                 url: '/api/sendmessage/{{current_user.istid}}',
                 type: 'POST',
-                data:JSON.stringify({
+                data: JSON.stringify({
                     "destination": $(".userList").dropdown('get value'),
                     "message": $("#message").val()
                 }),
@@ -236,7 +241,7 @@
 
         $("#checkInButton").click(function () {
             $.ajax({
-                url: '/api/check_in/' + $("#roomId").text().substring(1) + '/{{current_user.istid}}',
+                url: '/api/check_in/' + roomId.substring(1) + '/{{current_user.istid}}',
                 type: 'POST',
                 dataType: 'json',
                 success: function (data) {
@@ -247,7 +252,7 @@
                         alert("User already checked in");
                     } else {
                         $("#screenToggle").show();
-                        if ($("#roomId").text()[0] == 'r') {
+                        if (roomId[0] == 'r') {
                             $("#reviewForm").show();
                         }
                     }

@@ -1,4 +1,11 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
+from flask import (
+    Flask,
+    render_template,
+    request,
+    send_from_directory,
+    redirect,
+    jsonify,
+)
 from flask_xmlrpcre.xmlrpcre import *
 import os
 import requests
@@ -9,25 +16,23 @@ from os.path import exists
 
 app = Flask(__name__)
 
-handler = XMLRPCHandler('api')
-handler.connect(app, '/api')
+handler = XMLRPCHandler("api")
+handler.connect(app, "/api")
+
 
 @handler.register
 def createRestaurant(name, room_id):
     if db.findRestaurant(room_id) == None:
         db.createRestaurant(name, room_id)
         url = "http://localhost:8000/api"
-        data = {
-        "link": "r%s" % room_id
-        }   
-        headers = {
-        "Content-Type": "application/json"
-        }
+        data = {"link": "r%s" % room_id}
+        headers = {"Content-Type": "application/json"}
         response = requests.post(url, json=data, headers=headers)
         print(response.status_code)
         print(response.json())
-        new_url = "http://localhost:8000/files/%s" % response.json()['filename']
+        new_url = "http://localhost:8000/files/%s" % response.json()["filename"]
         return new_url
+
 
 @handler.register
 def validateRestaurant(room_id):
@@ -35,16 +40,18 @@ def validateRestaurant(room_id):
         return False
     else:
         return True
-    
+
+
 @handler.register
 def myRestaurants():
     restaurants = []
     for row in db.myRestaurants():
-        print (row.name)
+        print(row.name)
         restaurants.append(row.name)
-    print ("My restaurants:")
-    print (restaurants)
+    print("My restaurants:")
+    print(restaurants)
     return restaurants
+
 
 @handler.register
 def updateMenu(room_id, menu):
@@ -53,6 +60,7 @@ def updateMenu(room_id, menu):
         db.deleteMenu(room_id)
     for item in menu:
         db.createMenu(item, room_id)
+
 
 @handler.register
 def showReviews(room_id):
@@ -65,53 +73,61 @@ def showReviews(room_id):
     return reviews
 
 
-
-@app.route('/')
-@app.route('/index')
+@app.route("/")
+@app.route("/index")
 def index():
     restaurants = []
     for row in db.session.query(db.Restaurant):
         restaurants.append(row.name)
-    return render_template('foodserviceapp.html', restaurants=restaurants)
+    return render_template("foodserviceapp.html", restaurants=restaurants)
 
-@app.route('/restaurant/<name>')
+
+@app.route("/restaurant/<name>")
 def restaurant(name):
-    return render_template('restaurant.html', restaurant=name)
+    return render_template("restaurant.html", restaurant=name)
 
-@app.route('/restaurant/<name>/menu')
+
+@app.route("/restaurant/<name>/menu")
 def menu(name):
     restaurant = db.findRestaurant(name)
     menu = []
     for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.room_id):
         menu.append(row.item)
-    return render_template('menu.html', menu=menu, restaurant=name)
+    return render_template("menu.html", menu=menu, restaurant=name)
 
-@app.route('/restaurant/<name>/review', methods=['GET', 'POST'])
+
+@app.route("/restaurant/<name>/review", methods=["GET", "POST"])
 def review(name):
-    if request.method == 'POST':
+    if request.method == "POST":
         restaurant = db.findRestaurant(name)
-        review = db.Review(restaurant_id=restaurant.room_id, review=request.form['review'])
+        review = db.Review(
+            restaurant_id=restaurant.room_id, review=request.form["review"]
+        )
         db.session.add(review)
         db.session.commit()
-        return redirect('/restaurant/%s' % name)
+        return redirect("/restaurant/%s" % name)
     else:
-        return render_template('review.html')
-    
-@app.route('/api/<room_id>/menu', methods=['GET'])
+        return render_template("review.html")
+
+
+@app.route("/api/<room_id>/menu", methods=["GET"])
 def menuAPI(room_id):
     restaurant = db.findRestaurant(room_id)
     menu = []
     for row in db.session.query(db.Menu).filter_by(restaurant_id=restaurant.room_id):
         menu.append(row.item)
-    return jsonify(menu)
 
-@app.route('/api/<room_id>/review/<user_id>', methods=['POST'])
+    return jsonify({"name": restaurant.name, "menu": menu})
+
+
+@app.route("/api/<room_id>/review/<user_id>", methods=["POST"])
 def reviewAPI(room_id):
     restaurant = db.findRestaurant(room_id)
-    review = db.Review(restaurant_id=restaurant.room_id, review=request.json['review'])
+    review = db.Review(restaurant_id=restaurant.room_id, review=request.json["review"])
     db.session.add(review)
     db.session.commit()
-    return jsonify({'status': 'ok'})
+    return jsonify({"status": "ok"})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8001, debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8001, debug=True)
