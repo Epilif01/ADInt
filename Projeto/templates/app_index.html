@@ -102,14 +102,13 @@
                     type: "GET",
                     success: function (data) {
                         console.log(data);
-                        alert(data);
-                        data = JSON.parse(data);
+                        $("#info").empty();
                         if (decodedText[0] == 's') {
-                            for (slot in data) {
+                            for (slot of data) {
                                 $("#info").append("<li>" + slot + "</li>");
                             }
                         } else if (decodedText[s] == 'r') {
-                            for (item in data) {
+                            for (item of data) {
                                 $("#info").append("<li>" + item + "</li>");
                             }
                         }
@@ -173,7 +172,7 @@
 
         $("#checkInButton").click(function () {
             $.ajax({
-                url: '/api/check_in/{{Room}}/{{current_user}}',
+                url: '/api/check_in/{{Room}}/{{current_user.istid}}',
                 type: 'POST',
                 dataType: 'json',
                 success: function (data) {
@@ -189,7 +188,7 @@
 
         $("#checkOutButton").click(function () {
             $.ajax({
-                url: '/api/check_out/{{current_user.id}}',
+                url: '/api/check_out/{{current_user.istid}}',
                 type: 'POST',
                 dataType: 'json',
                 success: function (data) {
@@ -209,9 +208,9 @@
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
 
-/*             setTimeout(function () {
-            $("#refreshMessages").click();
-            }, 5000); */
+            setTimeout(function () {
+                $("#refreshMessages").click();
+            }, 5000);
         });
         $("#screenToggle1").click(function () {
             $("#screenToggle").toggle();
@@ -219,7 +218,7 @@
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
 
-            // clearTimeout();
+            clearTimeout();
         });
     </script>
 </body>
