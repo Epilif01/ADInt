@@ -74,7 +74,7 @@ def other_route():
 
 @app.route('/api/<room_id>/menu', methods=['GET'])
 def menuAPI(room_id):
-    return jsonify(requests.get("http://localhost:8000/api/%s/menu" % room_id,
+    return jsonify(requests.get("http://localhost:8001/api/%s/menu" % room_id,
                         headers={
                             'Accept': 'application/json',
                         }).json())
@@ -88,6 +88,16 @@ def schedule(room_id):
                             'Accept': 'application/json',
                         }).json())
 
+
+
+
+@app.route("/api/sendmessage/<user_id>", methods=["POST"])
+def api_send_message(user_id):
+    return jsonify(requests.post("http://localhost:8004/api/sendmessage/%s" % user_id,
+                        data=request.form,
+                        headers={
+                            'Accept': 'application/json',
+                        }).json())
 
 @app.route("/api/messagesreceived/<user_id>", methods=["GET"])
 def api_messages_received(user_id):
