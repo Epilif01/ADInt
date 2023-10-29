@@ -60,12 +60,12 @@
             <h2>Room: {{Room}}</h2>
             <button class="btn btn-primary" id="checkInButton">Check in</button>
             <button class="btn btn-primary" id="checkOutButton" style="display:none;">Check out</button>
-            <div class="ui dropdown" id="userList">
+            <!-- <div class="ui dropdown" id="userList">
                 <div class="text">Select User</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
                 </div>
-            </div>
+            </div> -->
             <div class="ui form" style="display:none;" id="messageForm">
                 <div class="field">
                     <textarea id="message" rows="2" placeholder="Type your message..."></textarea>
@@ -73,6 +73,8 @@
                 <button class="ui primary button" type="submit">Send</button>
             </div>
             <h2>Messages:</h2>
+            <button class="btn btn-primary" id="refreshMessages">Refresh</button>
+            <ul id="messagelist"></ul>
 
         </div>
     </div>
@@ -112,7 +114,7 @@
         var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250, rememberLastUsedCamera: false });
         html5QrcodeScanner.render(onScanSuccess);
 
-        $("#userList").dropdown({
+        /* $("#userList").dropdown({
             onShow: function () {
                 $("#userList .menu").empty();
                 $.ajax({
@@ -129,30 +131,30 @@
                         console.log("Error: " + error);
                     }
                 });
-            },
+            }, 
             onActionable: function (value, text, $selectedItem) {
                 $("#messageForm").show();
                 { { destination = value } }
             }
-        });
+        }); */
 
-        // $("#refreshUsers").click(function () {
-        //     $("#userlist").empty();
-        //     $.ajax({
-        //         url: '/api/checked_in/{{Room}}',
-        //         type: 'GET',
-        //         dataType: 'json',
-        //         success: function (data) {
-        //             var users = JSON.parse(data);
-        //             for (user in users) {
-        //                 $("#userlist").append("<li>" + user.id + "</li>");
-        //             }
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.log("Error: " + error);
-        //         }
-        //     });
-        // });
+        $("#refreshMessages").click(function () {
+            $("#messagelist").empty();
+            $.ajax({
+                url: 'http://localhost:8004/api/messagesreceived/{{current_user.id}}',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var messages = JSON.parse(data);
+                    for (message in messages) {
+                        $("#messagelist").append("<li>" + user.id + "</li>");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
 
         $("#checkInButton").click(function () {
             $.ajax({
@@ -192,9 +194,9 @@
             $("#screenToggle2").toggle();
             $("#screenToggle3").toggle();
 
-            // setTimeout(function () {
-            //     $("#refreshUsers").click();
-            // }, 5000);
+            setTimeout(function () {
+            $("#refreshMessages").click();
+            }, 5000);
         });
         $("#screenToggle1").click(function () {
             $("#screenToggle").toggle();
