@@ -102,7 +102,10 @@ def check_outAPI(user_id):
 
 @app.route("/api/checked_in/<path:place_id>")
 def checked_inAPI(place_id):
-    checked_in = db.getCheckedIn(place_id)
+    checked_in = []
+    for row in db.getCheckedIn(place_id):
+        checked_in.append(row.user_id)
+
     return jsonify(checked_in)
 
 
