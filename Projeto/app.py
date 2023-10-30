@@ -108,15 +108,25 @@ def menuAPI(room_id):
 
 @app.route("/api/<room_id>/review/<user_id>", methods=["POST"])
 def evaluateAPI(room_id, user_id):
-    return jsonify(
-        requests.post(
-            "http://localhost:8001/api/%s/review/%s" % (room_id, user_id),
-            data=request.json,
-            headers={
-                "Accept": "application/json",
+
+    try:
+        review = request.json["review"]
+        
+        response = requests.post(
+            "http://localhost:8001/api/%d/review/%s" % room_id, user_id,
+            json={
+                "review": review,
             },
-        ).json()
-    )
+            headers={
+                "Content-Type": "application/json"
+            }
+        )
+        
+        # Return the response from the Send Messages Server to the browser
+        return jsonify(response.json())
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/<room_id>/schedule")
 def schedule(room_id):
@@ -136,7 +146,6 @@ def api_send_message(user_id):
         message = request.json["message"]
         destination = request.json["destination"]
         
-        # Forward the request to the Send Messages Server
         response = requests.post(
             "http://localhost:8004/api/sendmessage/%s" % user_id,
             json={
@@ -147,8 +156,6 @@ def api_send_message(user_id):
                 "Content-Type": "application/json"
             }
         )
-        
-        # Return the response from the Send Messages Server to the browser
         return jsonify(response.json())
 
     except Exception as e:
