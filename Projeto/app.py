@@ -51,11 +51,12 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), nullable=True)
     token = db.Column(db.String(300))
 
+
 class Enrollments(db.Model):
     __tablename__ = "enrollments"
     id = db.Column(db.Integer, primary_key=True)
     courseid = db.Column(db.Integer, nullable=False)
-    istid = db.Column(db.String(64), nullable=False)    
+    istid = db.Column(db.String(64), nullable=False)
 
 
 @login.user_loader
@@ -87,6 +88,7 @@ def other_route():
     except:
         abort(401, "not logged in in FLASK")
 
+
 @app.route("/api/<user_id>/courses")
 def coursesAPI(user_id):
     data = db.session.query(Enrollments).filter_by(istid=user_id)
@@ -94,6 +96,7 @@ def coursesAPI(user_id):
     for row in data:
         courses.append(row.courseid)
     return jsonify(courses)
+
 
 @app.route("/api/<room_id>/menu", methods=["GET"])
 def menuAPI(room_id):
@@ -106,27 +109,26 @@ def menuAPI(room_id):
         ).json()
     )
 
+
 @app.route("/api/<room_id>/review/<user_id>", methods=["POST"])
 def evaluateAPI(room_id, user_id):
-
     try:
         review = request.json["review"]
-        
+
         response = requests.post(
-            "http://localhost:8001/api/%d/review/%s" % room_id, user_id,
+            "http://localhost:8001/api/%s/review/%s" % (room_id, user_id),
             json={
                 "review": review,
             },
-            headers={
-                "Content-Type": "application/json"
-            }
+            headers={"Content-Type": "application/json"},
         )
-        
+
         # Return the response from the Send Messages Server to the browser
         return jsonify(response.json())
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/api/<room_id>/schedule")
 def schedule(room_id):
@@ -145,21 +147,17 @@ def api_send_message(user_id):
     try:
         message = request.json["message"]
         destination = request.json["destination"]
-        
+
         response = requests.post(
             "http://localhost:8004/api/sendmessage/%s" % user_id,
-            json={
-                "message": message,
-                "destination": destination
-            },
-            headers={
-                "Content-Type": "application/json"
-            }
+            json={"message": message, "destination": destination},
+            headers={"Content-Type": "application/json"},
         )
         return jsonify(response.json())
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/api/messagesreceived/<user_id>", methods=["GET"])
 def api_messages_received(user_id):
@@ -320,17 +318,17 @@ def oauth2_callback(provider):
             "Authorization": "Bearer " + oauth2_token,
             "Accept": "application/json",
         },
-    ) 
+    )
     if response.status_code != 200:
         abort(401)
     courses = response.json()["enrolments"]
     for course in courses:
         courseid = course["id"]
-        enroll = db.session.scalar(db.select(Enrollments).where(Enrollments.courseid == courseid))
+        enroll = db.session.scalar(
+            db.select(Enrollments).where(Enrollments.courseid == courseid)
+        )
         if enroll is None:
-            enroll = Enrollments(
-                courseid=courseid, istid=istid
-            )
+            enroll = Enrollments(courseid=courseid, istid=istid)
             db.session.add(enroll)
             db.session.commit()
 

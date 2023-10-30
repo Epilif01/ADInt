@@ -121,9 +121,11 @@ def menuAPI(room_id):
 
 
 @app.route("/api/<room_id>/review/<user_id>", methods=["POST"])
-def reviewAPI(room_id):
+def reviewAPI(room_id, user_id):
     restaurant = db.findRestaurant(room_id)
-    review = db.Review(restaurant_id=restaurant.room_id, review=request.json["review"])
+    review = db.Review(
+        restaurant_id=restaurant.room_id, review=request.json["review"], user_id=user_id
+    )
     db.session.add(review)
     db.session.commit()
     return jsonify({"status": "ok"})

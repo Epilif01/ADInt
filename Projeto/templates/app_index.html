@@ -212,6 +212,25 @@
             });
         });
 
+        $("#sendReviewBt").click(function () {
+            $.ajax({
+                url: '/api/' + roomId.substring(1) + '/review/{{current_user.istid}}',
+                type: 'POST',
+                data: JSON.stringify({
+                    "review": $("#review").val()
+                }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    $("#review").val("");
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
 
         $("#refreshMessages").click(function () {
             $("#messagelist").empty();
