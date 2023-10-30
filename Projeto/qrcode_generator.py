@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
+from flask import Flask, request, send_from_directory, jsonify
 import os
 import datetime
 import qrcode
-from os.path import exists
 import uuid
 import glob
 
@@ -32,17 +31,6 @@ def create_qrcode(data):
     return filename
 
 app = Flask(__name__)
-
-@app.route("/", methods=['GET', 'POST'])
-@app.route("/index", methods=['GET', 'POST'])
-def index():
-    if request.method == 'GET':
-        return render_template("qrcodegenerator.html") 
-    else:
-        print(request.form)
-        qrcode_text = request.form['qrcodetext']
-        filename = create_qrcode(qrcode_text)
-        return send_from_directory(directory=FILE_DIR, path=filename)
     
 @app.route('/files/<filename>')
 def uploaded_file(filename):

@@ -1,10 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 
-import datetime
+
 from sqlalchemy.orm import sessionmaker
 from os import path
 

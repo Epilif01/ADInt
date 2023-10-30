@@ -1,9 +1,5 @@
 from flask import (
     Flask,
-    render_template,
-    request,
-    send_from_directory,
-    redirect,
     jsonify,
 )
 from flask_xmlrpcre.xmlrpcre import *
@@ -71,29 +67,6 @@ def updateSchedule(room_id, data):
         db.deleteSchedule(room_id)
 
     db.createSchedule(room_id, data)
-
-
-@app.route("/")
-@app.route("/index")
-def index():
-    rooms = []
-    for row in db.session.query(db.Room):
-        rooms.append((row.name, row.room_id))
-    return render_template("roomserviceapp.html", rooms=rooms)
-
-
-@app.route("/room/<room_id>")
-def room(room_id):
-    return render_template("room.html", room_id=room_id)
-
-
-@app.route("/room/<room_id>/schedule")
-def schedule(room_id):
-    schedule = []
-    for row in db.session.query(db.Schedule).filter_by(room_id=room_id):
-        schedule.append((row.day, row.slot_start, row.slot_end))
-    return render_template("schedule.html", schedule=schedule, room_id=room_id)
-
 
 @app.route("/api/<room_id>/schedule")
 def scheduleAPI(room_id):
